@@ -161,3 +161,48 @@
   * (({LIKE "%キーワード%"}))
     * ANDもORも日本語も可
     * 大文字小文字無視も可
+
+= 日本語をもっと！
+
+  * (('note:いわゆる'))全角アルファベット対応
+
+= 全角アルファベット
+
+  # coderay sql
+  SELECT *
+    FROM memos
+    WHERE content LIKE "%Ｈｅｌｌｏ%";
+  -- +-----------------+
+  -- | content         |
+  -- +-----------------+
+  -- +-----------------+
+
+= Collation変更
+
+  # coderay sql
+  ALTER TABLE memos
+    MODIFY COLUMN
+      content
+        TEXT
+        COLLATE utf8mb4_unicode_ci;
+
+= utf8mb4_unicode_ci
+
+  * Unicode的に同じ文字を同一視\n
+    (('note:（直感的だけど雑な説明）'))\n
+    * 例：全角文字半角文字を同一視\n
+      (('note:参考：http://tmtms.hatenablog.com/entry/20110416/mysql_unicode_collation'))
+  * utf8mb4_general_ciより遅い
+
+= 全角アルファベット
+
+  # coderay sql
+  SELECT *
+    FROM memos
+    WHERE content LIKE "%Ｈｅｌｌｏ%";
+  -- +--------------+
+  -- | content      |
+  -- +--------------+
+  -- | Hello world! |
+  -- | Hello MySQL! |
+  -- +--------------+
