@@ -1,0 +1,69 @@
+= いろいろ考えると\n日本語の全文検索も\nMySQLがいいね！
+
+: author
+   須藤功平
+: institution
+   日本MySQLユーザ会
+: content-source
+   OSC2014 Tokyo/Fall
+: date
+   2014/10/18
+: allotted-time
+   45m
+: theme
+   .
+
+= 目標
+
+日本語対応の\n
+全文検索機能を\n
+実装できる
+
+= 前提
+
+  * MySQLを使っている
+  * 日本語テキストを検索したい
+  * でも、全文検索をよく知らない
+
+= 全文検索について
+
+全文検索とは…
+
+= とりあえず動かそう
+
+  * データベース作成
+  * テーブル作成
+  * データ投入
+  * 全文検索！
+
+= データベース作成
+
+  # coderay sql
+  CREATE DATABASE full_text_search;
+  USE full_text_search;
+
+= テーブル作成
+
+  # coderay sql
+  CREATE TABLE memos (
+    content TEXT
+  );
+
+= データ投入
+
+  # coderay sql
+  INSERT INTO memos
+    VALUES ("Hello world!"),
+           ("Good-bye world!");
+
+= 全文検索！
+
+  # coderay sql
+  SELECT *
+    FROM memos
+    WHERE content LIKE "%Hello%";
+  -- +--------------+
+  -- | content      |
+  -- +--------------+
+  -- | Hello world! |
+  -- +--------------+

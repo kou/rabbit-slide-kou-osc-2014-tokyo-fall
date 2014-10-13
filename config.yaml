@@ -1,0 +1,24 @@
+---
+id: osc-2014-tokyo-fall
+base_name: mysql-japanese-full-text-search
+tags:
+- rabbit
+- mysql
+- full-text-search
+- mroonga
+presentation_date: 2014-10-18
+version: 2014.10.18.0
+licenses:
+- CC BY-SA 4.0
+slideshare_id: 
+speaker_deck_id: 
+ustream_id: 
+vimeo_id: 
+youtube_id: 
+author:
+  markup_language: :rd
+  name: Kouhei Sutou
+  email: kou@cozmixng.org
+  rubygems_user: kou
+  slideshare_user: kou
+  speaker_deck_user: kou
