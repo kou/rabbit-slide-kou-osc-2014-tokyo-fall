@@ -1,3 +1,5 @@
 /.tmp/
 /pkg/
 /pdf/
+/benchmark/data/
+/benchmark/tmp/
