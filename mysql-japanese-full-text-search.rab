@@ -17,6 +17,7 @@
 
 日本語対応の\n
 全文検索機能を\n
+(('note:（そこそこ仕組みをわかった上で）'))\n
 実装できる
 
 = 前提
@@ -47,14 +48,15 @@
   # coderay sql
   CREATE TABLE memos (
     content TEXT
-  );
+  ) DEFAULT CHARSET=utf8mb4;
 
 = データ投入
 
   # coderay sql
   INSERT INTO memos
     VALUES ("Hello world!"),
-           ("Good-bye world!");
+           ("Good-bye world!"),
+           ("Hello MySQL!");
 
 = 全文検索！
 
@@ -66,4 +68,96 @@
   -- | content      |
   -- +--------------+
   -- | Hello world! |
+  -- | Hello MySQL! |
   -- +--------------+
+
+= 全文検索！ - もっと
+
+  * AND
+  * OR
+  * 大文字小文字無視
+  * 日本語
+
+= 全文検索！ - AND
+
+  # coderay sql
+  SELECT *
+    FROM memos
+    WHERE content LIKE "%Hello%" AND
+          content LIKE "%world%";
+  -- +--------------+
+  -- | content      |
+  -- +--------------+
+  -- | Hello world! |
+  -- +--------------+
+
+= 全文検索！ - OR
+
+  # coderay sql
+  SELECT *
+    FROM memos
+    WHERE content LIKE "%world%" OR
+          content LIKE "%Good%";
+  -- +-----------------+
+  -- | content         |
+  -- +-----------------+
+  -- | Hello world!    |
+  -- | Good-bye world! |
+  -- +-----------------+
+
+= 大文字小文字無視
+
+  # coderay sql
+  SELECT *
+    FROM memos
+    WHERE content LIKE "%mysql%";
+  -- +--------------+
+  -- | content      |
+  -- +--------------+
+  -- | Hello MySQL! |
+  -- +--------------+
+
+= 大文字小文字無視 - 理由
+
+  # coderay sql
+  SHOW TABLE STATUS LIKE "memos"\G
+  -- ...
+  -- Collation: utf8mb4_general_ci
+  -- ...
+
+= Collation
+
+  * 照合順序(('note:（って言われてわかる？）'))
+  * 文字の比較ルール
+    * 「a」と「b」はどっちが大きい？
+    * 「a」と「A」は等しい？
+  * utf8mb4_general_ci
+    * 同じようなアルファベットは同一視\n
+      (('note:（直感的だけど雑な説明）'))
+
+= 日本語 - データ投入
+
+  # coderay sql
+  INSERT INTO memos
+    VALUES ("こんにちは"),
+           ("こんばんは");
+
+= 日本語 - 全文検索！
+
+  # coderay sql
+  SELECT *
+    FROM memos
+    WHERE content LIKE "%こんにち%";
+  -- +-----------------+
+  -- | content         |
+  -- +-----------------+
+  -- | こんにちは      |
+  -- +-----------------+
+
+= 全文検索の実装方法まとめ
+
+  * (({DEFAULT CHARSET=utf8mb4}))
+  * (({INSERT}))
+  * (({LIKE "%キーワード%"}))
+    * ANDもORも日本語も可
+    * 大文字小文字無視も可
