@@ -191,7 +191,8 @@
   * Unicode的に同じ文字を同一視\n
     (('note:（直感的だけど雑な説明）'))\n
     * 例：全角文字半角文字を同一視\n
-      (('note:参考：http://tmtms.hatenablog.com/entry/20110416/mysql_unicode_collation'))
+      (('note:参考：MySQL 5.5 の unicode collation で同一視される文字'))\n
+      (('note:http://tmtms.hatenablog.com/entry/20110416/mysql_unicode_collation'))
   * utf8mb4_general_ciより遅い
 
 = 全角アルファベット
@@ -206,3 +207,7 @@
   -- | Hello world! |
   -- | Hello MySQL! |
   -- +--------------+
+
+= 性能
+
+  * TODO
