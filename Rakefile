@@ -91,6 +91,15 @@ namespace :benchmark do
           table_name_suffix = n_records.to_s
         end
         table_name = "ratings_#{table_name_suffix}"
+
+        sql = <<-SQL
+SELECT AVG(CHAR_LENGTH(comment)) AS average,
+       MIN(CHAR_LENGTH(comment)) as min,
+       MAX(CHAR_LENGTH(comment)) as max
+  FROM #{table_name};
+        SQL
+        sh("mysql -u root full_text_search -e '#{sql}'")
+
         sql = <<-SQL
 SET SESSION query_cache_type = OFF;
 SELECT COUNT(*) FROM #{table_name} WHERE #{condition};
@@ -99,6 +108,7 @@ SELECT COUNT(*) FROM #{table_name} WHERE #{condition};
           sh("mysql -u root full_text_search -e '#{sql}'")
         end
         puts("#{n_records}: #{elapsed}")
+        $stdout.flush
       end
     end
   end
