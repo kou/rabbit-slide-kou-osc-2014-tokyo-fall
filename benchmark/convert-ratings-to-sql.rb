@@ -2,9 +2,11 @@
 
 require "csv"
 
+table_name = ARGV.shift
+
 csv = CSV.new(ARGF, :headers => true)
 csv.each_slice(1000) do |rows|
-  puts("INSERT INTO ratings VALUES")
+  puts("INSERT INTO #{table_name} VALUES")
   nth_row = 0
   rows.each do |row|
     puts(",") unless nth_row.zero?

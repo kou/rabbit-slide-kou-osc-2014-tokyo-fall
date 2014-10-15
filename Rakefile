@@ -42,6 +42,14 @@ namespace :benchmark do
     touch(ratings_csv) if File.exist?(ratings_csv)
   end
 
+  n_records_list = [
+    1000,
+    5000,
+    10000,
+    100000,
+    :all,
+  ]
+
   prepared_time_stamp = "#{tmp_dir}/prepared.time_stamp"
   initialize_database_sql = "#{benchmark_dir}/initialize-database.sql"
   convert_ratings_to_sql = "#{benchmark_dir}/convert-ratings-to-sql.rb"
@@ -53,20 +61,45 @@ namespace :benchmark do
   ]
   file prepared_time_stamp => prepare_files do
     sh("mysql -u root < #{initialize_database_sql}")
-    sh("#{convert_ratings_to_sql} #{ratings_csv} | " +
-       "mysql -u root full_text_search")
+    n_records_list.each do |n_records|
+      if n_records == :all
+        read_command = "cat"
+        table_name_suffix = "all"
+      else
+        read_command = "head -#{n_records + 1}"
+        table_name_suffix = n_records.to_s
+      end
+      sh("#{read_command} #{ratings_csv} | " +
+         "#{convert_ratings_to_sql} ratings_#{table_name_suffix} | " +
+         "mysql -u root full_text_search")
+    end
     touch(prepared_time_stamp)
   end
 
   desc "Run benchmark"
   task :run => prepared_time_stamp do
-    sql = <<-SQL
+    conditions = [
+      "comment LIKE \"%ラーメン%\"",
+      "comment LIKE \"%ラーメン%\" AND comment LIKE \"%焼き肉%\"",
+      "comment LIKE \"%ラーメン%\" OR  comment LIKE \"%焼き肉%\"",
+    ]
+    conditions.each do |condition|
+      n_records_list.each do |n_records|
+        if n_records == :all
+          table_name_suffix = "all"
+        else
+          table_name_suffix = n_records.to_s
+        end
+        table_name = "ratings_#{table_name_suffix}"
+        sql = <<-SQL
 SET SESSION query_cache_type = OFF;
-SELECT COUNT(*) FROM ratings WHERE comment LIKE "%ラーメン%";
-    SQL
-    elapsed = Benchmark.measure do
-      sh("mysql -u root full_text_search -e '#{sql}'")
+SELECT COUNT(*) FROM #{table_name} WHERE #{condition};
+        SQL
+        elapsed = Benchmark.measure do
+          sh("mysql -u root full_text_search -e '#{sql}'")
+        end
+        puts("#{n_records}: #{elapsed}")
+      end
     end
-    puts(elapsed)
   end
 end
