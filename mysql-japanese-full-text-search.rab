@@ -99,13 +99,13 @@
   # coderay sql
   SELECT *
     FROM memos
-    WHERE content LIKE "%world%" OR
-          content LIKE "%Good%";
+    WHERE content LIKE "%Good%" OR
+          content LIKE "%MySQL%";
   -- +-----------------+
   -- | content         |
   -- +-----------------+
-  -- | Hello world!    |
   -- | Good-bye world! |
+  -- | Hello MySQL!    |
   -- +-----------------+
 
 = 大文字小文字無視
@@ -750,7 +750,7 @@ MySQLがいいね！\n
 = お知らせ2
 
   * MariaDBにMronogaバンドル！
-    * 10.0.14から組み込み！
+    * 10.0.15から組み込み！
     * 別途インストールしなくてよい！
 
 = お知らせ3
@@ -764,7 +764,7 @@ MySQLがいいね！\n
 
 = お知らせ4
 
-  * Mroongaをもっと知りたい
+  * Groongaをもっと知りたい
     * Groongaドキュメント読書会
     * 詳細は↑で検索
     * Mroongaが使っている\n
