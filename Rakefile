@@ -48,6 +48,8 @@ namespace :benchmark do
     10000,
     100000,
     :all,
+    :all_index,
+    :all_index_id,
   ]
 
   prepared_time_stamp = "#{tmp_dir}/prepared.time_stamp"
@@ -62,15 +64,13 @@ namespace :benchmark do
   file prepared_time_stamp => prepare_files do
     sh("mysql -u root < #{initialize_database_sql}")
     n_records_list.each do |n_records|
-      if n_records == :all
+      if n_records.is_a?(Symbol)
         read_command = "cat"
-        table_name_suffix = "all"
       else
         read_command = "head -#{n_records + 1}"
-        table_name_suffix = n_records.to_s
       end
       sh("#{read_command} #{ratings_csv} | " +
-         "#{convert_ratings_to_sql} ratings_#{table_name_suffix} | " +
+         "#{convert_ratings_to_sql} ratings_#{n_records} | " +
          "mysql -u root full_text_search")
     end
     touch(prepared_time_stamp)
@@ -78,19 +78,33 @@ namespace :benchmark do
 
   desc "Run benchmark"
   task :run => prepared_time_stamp do
-    conditions = [
-      "comment LIKE \"%ラーメン%\"",
-      "comment LIKE \"%ラーメン%\" AND comment LIKE \"%焼き肉%\"",
-      "comment LIKE \"%ラーメン%\" OR  comment LIKE \"%焼き肉%\"",
+    queries = [
+      [:and, "ラーメン"],
+      [:and, "ラーメン", "焼き肉"],
+      [:or, "ラーメン", "焼き肉"],
     ]
-    conditions.each do |condition|
+    queries.each do |query|
+      operator, *keywords = query
       n_records_list.each do |n_records|
-        if n_records == :all
-          table_name_suffix = "all"
+        if n_records == :all_index or n_records == :all_index_id
+          keywords_in_boolean_mode = keywords.collect do |keyword|
+            if operator == :and
+              "+#{keyword}"
+            else
+              keyword
+            end
+          end
+          boolean_mode_query = keywords_in_boolean_mode.join(" ")
+          condition =
+            "MATCH (comment) " +
+            "AGAINST (\"#{boolean_mode_query}\" IN BOOLEAN MODE)"
         else
-          table_name_suffix = n_records.to_s
+          conditions = keywords.collect do |keyword|
+            "#{comment} LIKE \"%#{keyword}%\""
+          end
+          condition = conditions.join(" #{operator.to_s.upcase} ")
         end
-        table_name = "ratings_#{table_name_suffix}"
+        table_name = "ratings_#{n_records}"
 
         sql = <<-SQL
 SELECT AVG(CHAR_LENGTH(comment)) AS average,

@@ -21,3 +21,14 @@ CREATE TABLE ratings_100000 (
 CREATE TABLE ratings_all (
   comment TEXT
 ) DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE ratings_all_index (
+  comment TEXT,
+  FULLTEXT INDEX (comment)
+) DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE ratings_all_index_id (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  comment TEXT,
+  FULLTEXT INDEX (comment)
+) DEFAULT CHARSET=utf8mb4;
